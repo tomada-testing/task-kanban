@@ -18,8 +18,6 @@ export async function register() {
 
     if (error) {
       console.error(`[Supabase] Connection failed: ${error.message}`);
-    } else {
-      console.log(`[Supabase] Connected successfully (${supabaseUrl})`);
     }
   } catch (error) {
     console.error("[Supabase] Connection failed:", error);
