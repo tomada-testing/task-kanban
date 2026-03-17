@@ -24,15 +24,13 @@ npm run test:watch # テストウォッチモード
 
 ## Architecture
 
-Onion Architecture + DDD。パスエイリアス `@/*` → `./src/*`。
+標準的な Next.js App Router 構成。パスエイリアス `@/*` → `./src/*`。
 
 ```
 src/
-├── domain/          # ドメインモデル、値オブジェクト、リポジトリインターフェース
-├── application/     # ユースケース、アプリケーションサービス
-├── infrastructure/  # 外部サービス実装（Supabase等）
-├── presentation/    # UIコンポーネント
-└── app/             # Next.js App Router（ルーティング層）
+├── app/             # ルーティング、ページ、レイアウト
+├── components/      # 再利用可能なUIコンポーネント
+└── lib/             # ユーティリティ、外部サービスクライアント
 ```
 
 ## Supabase
@@ -52,20 +50,10 @@ src/
 
 | ファイル | 用途 | 使用場所 |
 |---|---|---|
-| `@/infrastructure/supabase/client` | ブラウザ用 (`createBrowserClient`) | Client Components |
-| `@/infrastructure/supabase/server` | サーバー用 (`createServerClient` + cookie管理) | Server Components, Route Handlers, Server Actions |
+| `@/lib/supabase/client` | ブラウザ用 (`createBrowserClient`) | Client Components |
+| `@/lib/supabase/server` | サーバー用 (`createServerClient` + cookie管理) | Server Components, Route Handlers, Server Actions |
 
 どちらも `createClient()` をエクスポート。サーバー用は `async` 関数（`await cookies()` のため）。
-
-### 接続確認
-
-`src/instrumentation.ts` でサーバー起動時に Supabase への接続状況をコンソールに出力する。
-
-```
-[Supabase] Connected successfully (https://xxx.supabase.co)
-[Supabase] Connection failed: ...
-[Supabase] Missing environment variables: ...
-```
 
 ### MCP
 
