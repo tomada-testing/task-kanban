@@ -22,16 +22,25 @@ npm run test       # テスト実行 (vitest run)
 npm run test:watch # テストウォッチモード
 ```
 
+## 機能
+
+- タスクのCRUD（一覧表示・追加・編集・削除）をカンバン形式（TODO / IN PROGRESS / DONE の3カラム）で提供
+- 削除前に確認ダイアログを表示
+- 変更はServer Actions経由でSupabaseに保存し、即座に一覧へ反映
+
 ## Architecture
 
 標準的な Next.js App Router 構成。パスエイリアス `@/*` → `./src/*`。
 
 ```
 src/
-├── app/             # ルーティング、ページ、レイアウト
+├── app/             # ルーティング、ページ、レイアウト、Server Actions
 ├── components/      # 再利用可能なUIコンポーネント
-└── lib/             # ユーティリティ、外部サービスクライアント
+└── lib/             # 型定義、Supabaseクライアント
 ```
+
+- `page.tsx`（async Server Component）で初期データ取得 → `TaskBoard`（Client Component）に渡す構成
+- データ変更はすべて `app/actions.ts` の Server Actions 経由。変更後に再取得してUIに反映
 
 ## コーディングルール
 - 変更後は必ず `npm test` でテストが通ることを確認してください
@@ -83,4 +92,15 @@ src/
 
 ### MCP
 
-Supabase MCP サーバーが利用可能。プロジェクト操作（マイグレーション適用、SQL実行、Edge Functions等）に使用する。
+Supabase MCP サーバーが利用可能。プロジェクト操作（マイグレーション適用、SQL実行、Edge Functions等）に使用する。プロジェクト ID は `list_projects` で取得すること。
+
+### テーブル
+
+- **`tasks`**: タスク情報（title, description, status, position 等）
+
+### DB運用上の注意点
+
+- `updated_at` はDBトリガーで自動更新されるため、アプリコードで設定不要
+- `status` カラムにCHECK制約あり。新ステータス追加時はマイグレーションが必要
+- RLSは有効だが認証未実装のため全アクセス許可ポリシー。認証追加時にポリシー変更が必要
+- スキーマ詳細は Supabase MCP の `list_tables` で確認
