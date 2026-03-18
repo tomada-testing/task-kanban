@@ -1,4 +1,7 @@
-import type { Task, TaskStatus } from "@/lib/types";
+import type { Task } from "@/lib/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface TaskCardProps {
   task: Task;
@@ -6,44 +9,30 @@ interface TaskCardProps {
   onDelete: (task: Task) => void;
 }
 
-const statusBorderColor: Record<TaskStatus, string> = {
-  TODO: "border-l-blue-500",
-  IN_PROGRESS: "border-l-amber-500",
-  DONE: "border-l-emerald-500",
-};
-
 export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   return (
-    <div
-      className={`rounded-lg border border-slate-300 border-l-[3px] ${statusBorderColor[task.status]} bg-white p-3 shadow-sm hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800`}
-    >
-      <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-100">
-        {task.title}
-      </h3>
-      {task.description && (
-        <p
-          data-testid="task-description"
-          className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-zinc-400"
-        >
-          {task.description}
-        </p>
-      )}
-      <div className="mt-3 flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => onEdit(task)}
-          className="rounded-md px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-zinc-400 dark:hover:bg-zinc-700"
-        >
-          編集
-        </button>
-        <button
-          type="button"
-          onClick={() => onDelete(task)}
-          className="rounded-md px-2.5 py-1 text-xs font-medium text-red-500 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
-        >
-          削除
-        </button>
-      </div>
-    </div>
+    <Card size="sm" className="py-2.5 shadow-sm transition-shadow hover:shadow-md">
+      <CardContent className="space-y-1.5 px-3">
+        <h3 className="text-[13px] font-semibold leading-snug">{task.title}</h3>
+        {task.description && (
+          <p
+            data-testid="task-description"
+            className="text-xs leading-relaxed text-muted-foreground"
+          >
+            {task.description}
+          </p>
+        )}
+        <div className="flex justify-end gap-1 pt-1">
+          <Button variant="outline" size="xs" onClick={() => onEdit(task)}>
+            <Pencil data-icon="inline-start" />
+            編集
+          </Button>
+          <Button variant="destructive" size="xs" onClick={() => onDelete(task)}>
+            <Trash2 data-icon="inline-start" />
+            削除
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -8,6 +8,7 @@
 - **Language**: TypeScript (strict mode)
 - **Database**: Supabase (PostgreSQL 17, region: ap-northeast-1)
 - **Auth/Client**: @supabase/supabase-js + @supabase/ssr
+- **UI Components**: shadcn/ui (Radix base-nova style, lucide icons)
 - **Styling**: Tailwind CSS v4
 - **Testing**: Vitest + Testing Library + jsdom
 - **Linting**: ESLint 9
@@ -60,13 +61,20 @@ src/
 - 状態遷移: 画面遷移の順方向・逆方向を検証してください
 - モック方針: 外部依存のみモック化してください
 
+## デザインルール
+- UIコンポーネントはshadcn/uiの標準variant・トークンを最優先で使うこと（手書きTailwindでの自作は避ける）
+- 色はshadcnのCSS変数（primary, secondary, muted, destructive等）を使うこと。カスタムカラーはステータスドット等の最小限に留める
+- 新しいUIパーツが必要な場合は、まず `npx shadcn@latest add <component>` で導入を検討すること
+- コンポーネント配置やサイズ調整はclassNameで行い、shadcn/uiのコンポーネントソース（`src/components/ui/`）は直接編集しない
+
 ## 禁止事項
 - console.logを本番コードに残さないでください
 - 既存のテストを削除しないでください
 - any型を使用しないでください
 
 ## MCP活用ルール
-- Next.js・Supabase・Vitestなどの最新仕様はContext7 MCPを使って公式ドキュメントを確認してください
+- Next.js・Supabase・Vitest・shadcn/uiなどの最新仕様はContext7 MCPを使って公式ドキュメントを確認してください
+- shadcn/uiコンポーネントの追加は `npx shadcn@latest add <component>` で行うこと（手動コピーしない）
 
 ## Supabase
 

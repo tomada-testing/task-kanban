@@ -12,6 +12,8 @@ import {
 import { TaskColumn } from "./TaskColumn";
 import { TaskForm } from "./TaskForm";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface TaskBoardProps {
   initialTasks: Task[];
@@ -89,11 +91,12 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
   return (
     <div>
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
-          {error}
-        </div>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
-      <div className="flex gap-6 overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto pb-4">
         {TASK_STATUSES.map((s) => (
           <TaskColumn
             key={s.value}

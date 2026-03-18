@@ -61,7 +61,7 @@ body {
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(0.97 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -139,4 +139,20 @@ body {
   html {
     @apply font-sans;
   }
+}
+
+/* Minimal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0 0 / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0 0 / 0.4);
 }

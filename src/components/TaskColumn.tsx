@@ -1,5 +1,11 @@
 import type { Task, TaskStatus } from "@/lib/types";
 import { TaskCard } from "./TaskCard";
+import { Card, CardHeader, CardTitle, CardAction, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Plus } from "lucide-react";
 
 interface TaskColumnProps {
   status: TaskStatus;
@@ -10,32 +16,11 @@ interface TaskColumnProps {
   onDelete: (task: Task) => void;
 }
 
-const statusColors = {
-  TODO: {
-    columnBg: "bg-white border border-slate-200 dark:bg-zinc-900 dark:border-zinc-700",
-    headerIndicator: "bg-blue-500",
-    badge:
-      "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    addBtn:
-      "text-blue-500 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/30",
-  },
-  IN_PROGRESS: {
-    columnBg: "bg-white border border-slate-200 dark:bg-zinc-900 dark:border-zinc-700",
-    headerIndicator: "bg-amber-500",
-    badge:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-    addBtn:
-      "text-amber-600 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-900/30",
-  },
-  DONE: {
-    columnBg: "bg-white border border-slate-200 dark:bg-zinc-900 dark:border-zinc-700",
-    headerIndicator: "bg-emerald-500",
-    badge:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-    addBtn:
-      "text-emerald-500 hover:bg-emerald-100 dark:text-emerald-400 dark:hover:bg-emerald-900/30",
-  },
-} as const;
+const statusDot: Record<TaskStatus, string> = {
+  TODO: "bg-blue-500",
+  IN_PROGRESS: "bg-amber-500",
+  DONE: "bg-emerald-500",
+};
 
 export function TaskColumn({
   status,
@@ -45,49 +30,46 @@ export function TaskColumn({
   onEdit,
   onDelete,
 }: TaskColumnProps) {
-  const colors = statusColors[status];
-
   return (
-    <div
-      className={`flex w-72 flex-shrink-0 flex-col overflow-hidden rounded-xl ${colors.columnBg}`}
-    >
-      <div className={`h-1 w-full ${colors.headerIndicator}`} />
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-slate-800 dark:text-zinc-300">
-            {label}
-          </h2>
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${colors.badge}`}
+    <Card className="flex w-72 flex-shrink-0 flex-col gap-0 py-0">
+      <CardHeader className="py-3">
+        <CardTitle className="flex items-center gap-2.5">
+          <div className={`size-2.5 rounded-full ${statusDot[status]}`} />
+          <span className="text-[13px] uppercase tracking-wide">{label}</span>
+          <Badge variant="secondary">{tasks.length}</Badge>
+        </CardTitle>
+        <CardAction>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => onAdd(status)}
+            aria-label="タスクを追加"
           >
-            {tasks.length}
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={() => onAdd(status)}
-          aria-label="タスクを追加"
-          className={`flex h-7 w-7 items-center justify-center rounded-lg text-base font-medium ${colors.addBtn}`}
-        >
-          +
-        </button>
-      </div>
-      <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto px-3 pb-3">
-        {tasks.length === 0 ? (
-          <p className="py-8 text-center text-sm text-slate-400 dark:text-zinc-500">
-            タスクがありません
-          </p>
-        ) : (
-          tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))
-        )}
-      </div>
-    </div>
+            <Plus />
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <Separator />
+      <CardContent className="flex-1 px-2.5 pb-2.5 pt-2.5">
+        <ScrollArea className="h-full">
+          <div className="flex flex-col gap-2">
+            {tasks.length === 0 ? (
+              <p className="py-10 text-center text-sm text-muted-foreground">
+                タスクがありません
+              </p>
+            ) : (
+              tasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 }
