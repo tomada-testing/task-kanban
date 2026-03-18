@@ -1,14 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import type { Task, TaskFormData, TaskStatus } from "@/lib/types";
+import type { Task } from "@/lib/types";
 import { TASK_STATUSES } from "@/lib/types";
-import {
-  fetchTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-} from "@/app/actions";
+import { useTaskBoard } from "./useTaskBoard";
 import { TaskColumn } from "./TaskColumn";
 import { TaskForm } from "./TaskForm";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -19,74 +13,21 @@ interface TaskBoardProps {
   initialTasks: Task[];
 }
 
-type FormModal =
-  | { mode: "add"; defaultStatus: TaskStatus }
-  | { mode: "edit"; task: Task };
-
-type DeleteModal = { taskId: string; taskTitle: string };
-
 export function TaskBoard({ initialTasks }: TaskBoardProps) {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [formModal, setFormModal] = useState<FormModal | null>(null);
-  const [deleteModal, setDeleteModal] = useState<DeleteModal | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  const refreshTasks = async () => {
-    const result = await fetchTasks();
-    if (result.success && result.data) {
-      setTasks(result.data);
-    }
-  };
-
-  const handleAdd = (status: TaskStatus) => {
-    setError(null);
-    setFormModal({ mode: "add", defaultStatus: status });
-  };
-
-  const handleEdit = (task: Task) => {
-    setError(null);
-    setFormModal({ mode: "edit", task });
-  };
-
-  const handleDeleteRequest = (task: Task) => {
-    setError(null);
-    setDeleteModal({ taskId: task.id, taskTitle: task.title });
-  };
-
-  const handleFormSubmit = (data: TaskFormData) => {
-    startTransition(async () => {
-      if (formModal?.mode === "add") {
-        const result = await createTask(data);
-        if (!result.success) {
-          setError(result.error ?? "エラーが発生しました");
-          return;
-        }
-      } else if (formModal?.mode === "edit") {
-        const result = await updateTask(formModal.task.id, data);
-        if (!result.success) {
-          setError(result.error ?? "エラーが発生しました");
-          return;
-        }
-      }
-      setFormModal(null);
-      await refreshTasks();
-    });
-  };
-
-  const handleDeleteConfirm = () => {
-    if (!deleteModal) return;
-    startTransition(async () => {
-      const result = await deleteTask(deleteModal.taskId);
-      if (!result.success) {
-        setError(result.error ?? "エラーが発生しました");
-        setDeleteModal(null);
-        return;
-      }
-      setDeleteModal(null);
-      await refreshTasks();
-    });
-  };
+  const {
+    tasks,
+    formModal,
+    deleteModal,
+    error,
+    isPending,
+    handleAdd,
+    handleEdit,
+    handleDeleteRequest,
+    handleFormSubmit,
+    handleDeleteConfirm,
+    closeFormModal,
+    closeDeleteModal,
+  } = useTaskBoard(initialTasks);
 
   return (
     <div>
@@ -128,7 +69,7 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
               : undefined
           }
           onSubmit={handleFormSubmit}
-          onCancel={() => setFormModal(null)}
+          onCancel={closeFormModal}
           isPending={isPending}
         />
       )}
@@ -138,7 +79,7 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
           title="削除確認"
           message={`タスク「${deleteModal.taskTitle}」を削除しますか？`}
           onConfirm={handleDeleteConfirm}
-          onCancel={() => setDeleteModal(null)}
+          onCancel={closeDeleteModal}
           isPending={isPending}
         />
       )}
