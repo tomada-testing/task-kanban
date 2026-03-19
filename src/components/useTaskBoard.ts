@@ -30,11 +30,6 @@ export interface TaskBoardState {
   closeDeleteModal: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function logAction(action: string, payload?: any) {
-  console.log(`[TaskBoard] ${action}`, payload);
-}
-
 export function useTaskBoard(initialTasks: Task[]): TaskBoardState {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [formModal, setFormModal] = useState<FormModal | null>(null);
@@ -52,13 +47,11 @@ export function useTaskBoard(initialTasks: Task[]): TaskBoardState {
   const handleAdd = (status: TaskStatus) => {
     setError(null);
     setFormModal({ mode: "add", defaultStatus: status });
-    logAction("add", { status });
   };
 
   const handleEdit = (task: Task) => {
     setError(null);
     setFormModal({ mode: "edit", task });
-    logAction("edit", { taskId: task.id });
   };
 
   const handleDeleteRequest = (task: Task) => {
@@ -74,16 +67,13 @@ export function useTaskBoard(initialTasks: Task[]): TaskBoardState {
           setError(result.error ?? "エラーが発生しました");
           return;
         }
-        logAction("created", result.data);
       } else if (formModal?.mode === "edit") {
         const result = await updateTask(formModal.task.id, data);
         if (!result.success) {
           setError(result.error ?? "エラーが発生しました");
           return;
         }
-        logAction("updated", result.data);
       }
-      // NOTE: 成功時のerrorリセット漏れ（前回エラーが残ったまま次の操作ができる）
       setFormModal(null);
       await refreshTasks();
     });
@@ -105,10 +95,6 @@ export function useTaskBoard(initialTasks: Task[]): TaskBoardState {
 
   const closeFormModal = () => setFormModal(null);
   const closeDeleteModal = () => setDeleteModal(null);
-
-  // タスクをステータスでフィルタ（マジックストリング）
-  const getTasksByStatus = (status: string) =>
-    tasks.filter((t) => t.status === status);
 
   return {
     tasks,
