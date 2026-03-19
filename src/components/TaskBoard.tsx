@@ -14,6 +14,7 @@ import { TaskForm } from "./TaskForm";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { DEFAULT_ERROR_MESSAGE } from "@/lib/constants";
 
 interface TaskBoardProps {
   initialTasks: Task[];
@@ -59,13 +60,13 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
       if (formModal?.mode === "add") {
         const result = await createTask(data);
         if (!result.success) {
-          setError(result.error ?? "エラーが発生しました");
+          setError(result.error ?? DEFAULT_ERROR_MESSAGE);
           return;
         }
       } else if (formModal?.mode === "edit") {
         const result = await updateTask(formModal.task.id, data);
         if (!result.success) {
-          setError(result.error ?? "エラーが発生しました");
+          setError(result.error ?? DEFAULT_ERROR_MESSAGE);
           return;
         }
       }
@@ -79,7 +80,7 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
     startTransition(async () => {
       const result = await deleteTask(deleteModal.taskId);
       if (!result.success) {
-        setError(result.error ?? "エラーが発生しました");
+        setError(result.error ?? DEFAULT_ERROR_MESSAGE);
         setDeleteModal(null);
         return;
       }
