@@ -14,6 +14,7 @@ import { TaskForm } from "./TaskForm";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { DEFAULT_ERROR_MESSAGE } from "@/lib/constants";
 
 interface TaskBoardProps {
   initialTasks: Task[];
@@ -24,8 +25,6 @@ type FormModal =
   | { mode: "edit"; task: Task };
 
 type DeleteModal = { taskId: string; taskTitle: string };
-
-const DEFAULT_ERROR_MESSAGE = "エラーが発生しました";
 
 export function TaskBoard({ initialTasks }: TaskBoardProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
