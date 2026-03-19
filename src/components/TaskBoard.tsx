@@ -25,6 +25,8 @@ type FormModal =
 
 type DeleteModal = { taskId: string; taskTitle: string };
 
+const DEFAULT_ERROR_MESSAGE = "エラーが発生しました";
+
 export function TaskBoard({ initialTasks }: TaskBoardProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [formModal, setFormModal] = useState<FormModal | null>(null);
@@ -59,13 +61,13 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
       if (formModal?.mode === "add") {
         const result = await createTask(data);
         if (!result.success) {
-          setError(result.error ?? "エラーが発生しました");
+          setError(result.error ?? DEFAULT_ERROR_MESSAGE);
           return;
         }
       } else if (formModal?.mode === "edit") {
         const result = await updateTask(formModal.task.id, data);
         if (!result.success) {
-          setError(result.error ?? "エラーが発生しました");
+          setError(result.error ?? DEFAULT_ERROR_MESSAGE);
           return;
         }
       }
@@ -79,7 +81,7 @@ export function TaskBoard({ initialTasks }: TaskBoardProps) {
     startTransition(async () => {
       const result = await deleteTask(deleteModal.taskId);
       if (!result.success) {
-        setError(result.error ?? "エラーが発生しました");
+        setError(result.error ?? DEFAULT_ERROR_MESSAGE);
         setDeleteModal(null);
         return;
       }
