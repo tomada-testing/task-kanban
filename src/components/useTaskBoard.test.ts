@@ -71,16 +71,28 @@ describe("useTaskBoard", () => {
     });
   });
 
-  it("handleAddでerrorがクリアされる", () => {
-    const { result } = renderHook(() => useTaskBoard(sampleTasks));
-
-    // まずエラーを発生させる
-    act(() => {
-      result.current.handleDeleteRequest(sampleTasks[0]);
+  it("handleAddでerrorがクリアされる", async () => {
+    mockCreateTask.mockResolvedValue({
+      success: false,
+      error: "作成に失敗しました",
     });
 
-    // handleAddでエラーがクリアされることを確認（エラー状態を直接セットできないため、
-    // formModalが開くことを確認）
+    const { result } = renderHook(() => useTaskBoard(sampleTasks));
+
+    // createTask失敗でerrorをセット
+    act(() => {
+      result.current.handleAdd("TODO");
+    });
+    await act(async () => {
+      result.current.handleFormSubmit({
+        title: "新規タスク",
+        description: "",
+        status: "TODO",
+      });
+    });
+    expect(result.current.error).toBe("作成に失敗しました");
+
+    // handleAddでerrorがクリアされることを確認
     act(() => {
       result.current.handleAdd("IN_PROGRESS");
     });
@@ -281,7 +293,64 @@ describe("useTaskBoard", () => {
     });
 
     expect(result.current.error).toBe("削除に失敗しました");
-    expect(result.current.deleteModal).toBeNull();
+    expect(result.current.deleteModal).not.toBeNull();
+  });
+
+  it("updateTask失敗時にerrorがセットされてformModalが閉じない", async () => {
+    mockUpdateTask.mockResolvedValue({
+      success: false,
+      error: "更新に失敗しました",
+    });
+
+    const { result } = renderHook(() => useTaskBoard(sampleTasks));
+
+    act(() => {
+      result.current.handleEdit(sampleTasks[0]);
+    });
+
+    await act(async () => {
+      result.current.handleFormSubmit({
+        title: "更新タスク",
+        description: "説明1",
+        status: "TODO",
+      });
+    });
+
+    expect(result.current.error).toBe("更新に失敗しました");
+    expect(result.current.formModal).not.toBeNull();
+  });
+
+  it("handleEditでerrorがクリアされる", async () => {
+    mockCreateTask.mockResolvedValue({
+      success: false,
+      error: "作成に失敗しました",
+    });
+
+    const { result } = renderHook(() => useTaskBoard(sampleTasks));
+
+    // createTask失敗でerrorをセット
+    act(() => {
+      result.current.handleAdd("TODO");
+    });
+    await act(async () => {
+      result.current.handleFormSubmit({
+        title: "新規タスク",
+        description: "",
+        status: "TODO",
+      });
+    });
+    expect(result.current.error).toBe("作成に失敗しました");
+
+    // handleEditでerrorがクリアされることを確認
+    act(() => {
+      result.current.handleEdit(sampleTasks[0]);
+    });
+
+    expect(result.current.formModal).toEqual({
+      mode: "edit",
+      task: sampleTasks[0],
+    });
+    expect(result.current.error).toBeNull();
   });
 
   it("handleDeleteConfirmはdeleteModalがnullの場合何もしない", async () => {

@@ -85,7 +85,6 @@ export function useTaskBoard(initialTasks: Task[]): TaskBoardState {
       const result = await deleteTask(deleteModal.taskId);
       if (!result.success) {
         setError(result.error ?? "エラーが発生しました");
-        setDeleteModal(null);
         return;
       }
       setDeleteModal(null);
